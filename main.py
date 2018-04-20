@@ -1,4 +1,5 @@
-from random import randint
+from random import *
+import random
 import copy
 import sys
 from Tkinter import *
@@ -59,7 +60,7 @@ class Map:
     def generateRandomMap(self, materials):
         for i in range(0, map_height):
             for j in range(0, map_width):
-                self.grid[i][j] = Cell(copy.copy(materials[randint(0, len(materials)-1)]), randint(0, 10), randint(5, 35), 0, randint(0, 100))
+                self.grid[i][j] = Cell(copy.copy(random.choice(materials)), randint(0, 10), randint(5, 35), 0, randint(0, 100))
 
     def drawMap(self):
         x_off = window_width/2 - map_width*scale/2
@@ -75,11 +76,22 @@ class Map:
         self.canvas.after(500, self.drawMap)
 
     def setWind(self):
-        w_dir = randint(-1, 1)
-        w_pow = randint(1, 12)
+        w_dir = random.choice([-1, 0, 1])
+        w_pow = random.choice([-1, 0, 0, 1]) #sila wiatru bedzie sie zmieniac wolniej
 
-        #if w_dir == 1 AND self.wind_dir == 359
-            #self.wind_dir
+        if w_dir == 1 and self.wind_dir == 359:
+            self.wind_dir = 0
+        elif  w_dir == -1 and self.wind_dir == 0:
+            self.wind_dir = 359
+        else:
+            self.wind_dir = w_dir
+
+        if w_pow == 1 and self.wind_power == 12:
+            self.wind_power = 12
+        elif  w_pow == -1 and self.wind_power == 1:
+            self.wind_power = 1
+        else:
+            self.wind_power = w_pow
 
 
         self.canvas.after(100, self.setWind)
