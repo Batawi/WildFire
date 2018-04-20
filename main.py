@@ -6,7 +6,7 @@ from Tkinter import *
 
 window_width = 800 #in pixels
 window_height = 600 #in pixels
-map_width = 10 #number of cells
+map_width = 20 #number of cells
 map_height = 10 #number of cells
 scale = 25
 
