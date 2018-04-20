@@ -57,6 +57,9 @@ class Map:
 
     # ---- METODY ----
 
+    def writeText(self, x, y, to_write):
+        self.canvas.create_text(x, y, fill="darkblue", font="Monospace 13", text=str(to_write), anchor="nw")
+
     def generateRandomMap(self, materials):
         for i in range(0, map_height):
             for j in range(0, map_width):
@@ -67,8 +70,8 @@ class Map:
         y_off = window_height/2 - map_height*scale/2
         for i in range(0, map_height):
             for j in range(0, map_width):
-                #col = "#%03x"%randint(0, 0xFFF)
-                col = self.grid[i][j].material.color
+                col = "#%03x"%randint(0, 0xFFF)
+                #col = self.grid[i][j].material.color
                 self.canvas.create_rectangle(j*scale+x_off, i*scale+y_off, (j+1)*scale+x_off, (i+1)*scale+y_off, fill=col)
 
         #canvas.create_rectangle(300, 300, 200, 10, fill="blue", outline="blue")
@@ -95,6 +98,8 @@ class Map:
 
 
         self.canvas.after(100, self.setWind)
+        self.writeText(10, 10, self.wind_dir)
+        self.writeText(10, 30, self.wind_power)
 
 
 
@@ -112,16 +117,21 @@ materials.append(Material("Tree", 1000, 1000, 30, 1, 1100, "#009933"))
 
 # ---- MAIN ----
 
-#window initburning_temp
+#window init
 root = Tk()
 root.title = "WildFire Simulator"
 canvas = Canvas(root, width = window_width, height = window_height)
 canvas.pack()
 
+#map class object init
 area = Map(map_width, map_height, canvas)
-area.generateRandomMap(materials)
 
+#methods start
+area.generateRandomMap(materials)
 area.drawMap()
+area.setWind()
+
+#loop start
 root.mainloop()
 
 
