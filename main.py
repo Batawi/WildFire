@@ -10,7 +10,11 @@ map_width = 10 #number of cells
 map_height = 10 #number of cells
 scale = 25
 
+<<<<<<< HEAD
 # ---- CLASSES ----test
+=======
+# ---- CLASSES ----
+>>>>>>> 8974b187f6accef6050e108d5c608bc9c08fd418
 
 class Material:
     index = 0 #number of created materials
