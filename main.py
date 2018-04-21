@@ -54,11 +54,22 @@ class Map:
         self.grid = [[0 for x in range(width)] for y in range(height)]
         self.wind_dir = randint(0, 359) #integer degree, cycling
         self.wind_power = randint(0 , 12) #beaufort
+        self.texts_to_update = []
 
     # ---- METODY ----
 
-    def writeText(self, x, y, to_write):
-        self.canvas.create_text(x, y, fill="darkblue", font="Monospace 13", text=str(to_write), anchor="nw")
+    def showClassVariables(self): #dont use in case of static texts
+        self.texts_to_update.append(self.canvas.create_text(10, 10, fill="darkblue", font="Monospace 13", text="", anchor="nw"))
+
+        self.texts_to_update.append(self.canvas.create_text(10, 25, fill="darkblue", font="Monospace 13", text="", anchor="nw"))
+
+        self._updateTexts()
+
+    def _updateTexts(self): #private method, dont use outside
+        self.canvas.itemconfig(self.texts_to_update[0], text="dir: "+str(self.wind_dir))
+        self.canvas.itemconfig(self.texts_to_update[1], text="power: "+str(self.wind_power))
+
+        self.canvas.after(100, self._updateTexts)
 
     def generateRandomMap(self, materials):
         for i in range(0, map_height):
@@ -80,28 +91,27 @@ class Map:
 
     def setWind(self):
         w_dir = random.choice([-1, 0, 1])
-        w_pow = random.choice([-1, 0, 0, 1]) #sila wiatru bedzie sie zmieniac wolniej
+        #w_pow = random.choice([-1, 0, 0, 0, 0, 0, 0, 0, 1]) #sila wiatru bedzie sie zmieniac wolniej
+        w_pow = randint(-20, 20)
 
         if w_dir == 1 and self.wind_dir == 359:
             self.wind_dir = 0
         elif  w_dir == -1 and self.wind_dir == 0:
             self.wind_dir = 359
         else:
-            self.wind_dir = w_dir
+            self.wind_dir += w_dir
 
         if w_pow == 1 and self.wind_power == 12:
             self.wind_power = 12
-        elif  w_pow == -1 and self.wind_power == 1:
+        elif w_pow == -1 and self.wind_power == 1:
             self.wind_power = 1
-        else:
-            self.wind_power = w_pow
+        elif w_pow == 1:
+            self.wind_power += 1
+        elif w_pow == -1:
+            self.wind_power -= 1
 
 
         self.canvas.after(100, self.setWind)
-        self.writeText(10, 10, self.wind_dir)
-        self.writeText(10, 30, self.wind_power)
-
-
 
 # ---- FUNCTIONS ----
 
@@ -130,6 +140,8 @@ area = Map(map_width, map_height, canvas)
 area.generateRandomMap(materials)
 area.drawMap()
 area.setWind()
+
+area.showClassVariables()
 
 #loop start
 root.mainloop()
