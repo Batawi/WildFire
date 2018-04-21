@@ -7,7 +7,7 @@ Simulation of wildfire spread using cellular automaton.
 * Alex
   - zrobic metode zapalającą (ma ustawic status materialy na 3)
 * Michał
-  - wiatr
+  - rozpoczac pisanie wlasciwej symulacji
 
 ## NOTES:
 
