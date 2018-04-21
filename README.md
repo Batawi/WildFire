@@ -23,4 +23,4 @@ Simulation of wildfire spread using cellular automaton.
 1. Kiedy kratka bedzie sie palic bedzie to sygnalizowane migajacym kolorem, im wolniej miga tym mniej jest paliwa na danej kratce a kolor materialu dazy do czarnego
 
 oddawanie do max 21.05
-git
+obliczenia rownolegle z CUDA
