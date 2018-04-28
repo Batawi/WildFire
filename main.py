@@ -4,12 +4,14 @@ import copy
 import sys
 from Tkinter import *
 
-
 window_width = 800 #in pixels
 window_height = 600 #in pixels
-map_width = 20 #number of cells
-map_height = 10 #number of cells
-scale = 25
+map_width = 50 #number of cells
+map_height = 50 #number of cells
+scale = 5
+time_stamp = 200 #time_stamp[ms] = 1[min] of simulation
+
+
 
 # ---- CLASSES ----
 
@@ -69,7 +71,7 @@ class Map:
         self.canvas.itemconfig(self.texts_to_update[0], text="dir: "+str(self.wind_dir))
         self.canvas.itemconfig(self.texts_to_update[1], text="power: "+str(self.wind_power))
 
-        self.canvas.after(100, self._updateTexts)
+        self.canvas.after(time_stamp, self._updateTexts)
 
     def generateRandomMap(self, materials):
         for i in range(0, map_height):
@@ -85,9 +87,8 @@ class Map:
                 #col = self.grid[i][j].material.color
                 self.canvas.create_rectangle(j*scale+x_off, i*scale+y_off, (j+1)*scale+x_off, (i+1)*scale+y_off, fill=col)
 
-        #canvas.create_rectangle(300, 300, 200, 10, fill="blue", outline="blue")
         self.canvas.pack()
-        self.canvas.after(500, self.drawMap)
+        self.canvas.after(time_stamp, self.drawMap)
 
     def setWind(self):
         w_dir = random.choice([-1, 0, 1])
@@ -110,13 +111,23 @@ class Map:
         elif w_pow == -1:
             self.wind_power -= 1
 
+        self.canvas.after(time_stamp, self.setWind)
 
-        self.canvas.after(100, self.setWind)
+    def ignition(self):
+        found = 0
+        while found == 0:
+            x = randint(0, map_width-1)
+            y = randint(0, map_height-1)
+            if(self.grid[y][x].material.state == 1):
+                found = 1
+                self.grid[y][x].material.state = 2
+                #print "ogien x: ", x, " y: ", y
+
+
 
 # ---- FUNCTIONS ----
 
 # ---- MATERIALS ----
-
 #fuel, auto ign, flash point, state, color
 materials = [] #new materials can be add freerly
 materials.append(Material("Water", 0, 0, 0, 0, 0, "#0099ff"))
@@ -138,9 +149,10 @@ area = Map(map_width, map_height, canvas)
 
 #methods start
 area.generateRandomMap(materials)
+area.ignition()
+
 area.drawMap()
 area.setWind()
-
 area.showClassVariables()
 
 #loop start
