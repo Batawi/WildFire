@@ -1,14 +1,14 @@
 from random import randint
 import copy
 import sys
-from Tkinter import *
+from tkinter import *
 
 
-window_width = 800 #in pixels
-window_height = 600 #in pixels
-map_width = 20 #number of cells
-map_height = 10 #number of cells
-scale = 25
+window_width = 1200 #in pixels
+window_height = 900 #in pixels
+map_width = 150 #number of cells
+map_height = 150 #number of cells
+scale = 5
 
 # ---- CLASSES ----
 
@@ -61,6 +61,23 @@ class Map:
             for j in range(0, map_width):
                 self.grid[i][j] = Cell(copy.copy(materials[randint(0, len(materials)-1)]), randint(0, 10), randint(5, 35), 0, randint(0, 100))
 
+    def randomCosmicGenerator(self, materials):
+        for i in range(0,map_height):
+            for j in range(0,map_width):
+                #Grass/Bushes/logs
+                if randint(0, 8) == 3:
+                    self.grid[i][j] = Cell(copy.copy(materials[2]), 3, 22, 0, 17)
+                elif randint(0, 3) == 3:
+                    self.grid[i][j] = Cell(copy.copy(materials[3]), 3, 22, 0, 17)
+                else:
+                    self.grid[i][j] = Cell(copy.copy(materials[1]), 3, 22, 0, 17)
+
+                #Trees
+
+                #Water
+
+
+
     def drawMap(self):
         x_off = window_width/2 - map_width*scale/2
         y_off = window_height/2 - map_height*scale/2
@@ -107,8 +124,8 @@ canvas = Canvas(root, width = window_width, height = window_height)
 canvas.pack()
 
 area = Map(map_width, map_height, canvas)
-area.generateRandomMap(materials)
-
+#area.generateRandomMap(materials)
+area.randomCosmicGenerator(materials)
 area.drawMap()
 root.mainloop()
 
