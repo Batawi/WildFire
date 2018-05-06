@@ -5,9 +5,9 @@ from tkinter import *
 
 
 window_width = 1200 #in pixels
-window_height = 900 #in pixels
-map_width = 150 #number of cells
-map_height = 150 #number of cells
+window_height = 1200 #in pixels
+map_width = 200 #number of cells
+map_height = 200 #number of cells
 scale = 5
 
 # ---- CLASSES ----
@@ -46,6 +46,7 @@ class Cell:
         # 0 nothing
         # <1, 10> rain
 
+
 class Map:
 
     def __init__(self, width, height, canvas):
@@ -56,25 +57,84 @@ class Map:
 
     # ---- METODY ----
 
+    def notCollide(self, x, y):
+        test = self.grid[x][y].material.id
+        if self.grid[x + 1][y + 1].material.id == test:     # 3
+            return -1
+        if self.grid[x][y + 1].material.id == test:       # 2
+            return -1
+        if self.grid[x - 1][y + 1].material.id == test:   # 1
+            return -1
+        if self.grid[x - 1][y].material.id == test:       # 4
+            return -1
+        if self.grid[x - 1][y - 1].material.id == test:   # 7
+            return -1
+        if self.grid[x][y - 1].material.id == test:       # 8
+            return -1
+        if self.grid[x + 1][y - 1].material.id == test:   # 9
+            return -1
+        if self.grid[x + 1][y].material.id == test:       # 6
+            return -1
+        return 1
     def generateRandomMap(self, materials):
         for i in range(0, map_height):
             for j in range(0, map_width):
                 self.grid[i][j] = Cell(copy.copy(materials[randint(0, len(materials)-1)]), randint(0, 10), randint(5, 35), 0, randint(0, 100))
 
     def randomCosmicGenerator(self, materials):
+
+        # Grass/Bushes/logs
         for i in range(0,map_height):
             for j in range(0,map_width):
-                #Grass/Bushes/logs
                 if randint(0, 8) == 3:
                     self.grid[i][j] = Cell(copy.copy(materials[2]), 3, 22, 0, 17)
-                elif randint(0, 3) == 3:
+                elif randint(0, 2) == 1:
                     self.grid[i][j] = Cell(copy.copy(materials[3]), 3, 22, 0, 17)
                 else:
                     self.grid[i][j] = Cell(copy.copy(materials[1]), 3, 22, 0, 17)
 
-                #Trees
+        #Trees
+        for i in range(1, map_height - 1):
+            for j in range(1, map_width - 1):
+                if randint(0, 3) == 1:
+                    self.grid[i][j] = Cell(copy.copy(materials[4]), 3, 22, 0, 17)
 
-                #Water
+        #Water
+        quantity = randint(1, 4)
+        for o in range(0, quantity):
+            # punkt poczatkowy jeziorka
+            i = randint(5, map_height - 1)
+            j = randint(5, map_width - 1)
+            self.grid[i][j] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+            # budowanie jeziorka
+            while 1:
+                if i+1 >= map_height or j+1 >= map_width or j <= 0: break
+                else:
+                    self.grid[i + 1][j + 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i + 1][j - 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i + 1][j] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i][j + 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+
+                if i-1 <= 0 or j-1 <= 0 or j >= map_width: break
+                else:
+                    self.grid[i - 1][j + 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i - 1][j - 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i - 1][j] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i][j - 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+
+                #  poszerzanie jeziorka
+                test = randint(0, 10)
+                if test < 4:
+                    j += 1
+                if test > 6:
+                    j -= 1
+                if test % 3 == 0:
+                    i += 1
+                if test == 5:
+                    test = test
+                if test % 3 == 1:
+                    i -= 1
+
 
 
 
@@ -124,7 +184,7 @@ canvas = Canvas(root, width = window_width, height = window_height)
 canvas.pack()
 
 area = Map(map_width, map_height, canvas)
-#area.generateRandomMap(materials)
+# area.generateRandomMap(materials)
 area.randomCosmicGenerator(materials)
 area.drawMap()
 root.mainloop()
