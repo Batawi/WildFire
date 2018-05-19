@@ -2,7 +2,8 @@ from random import *
 import random
 import copy
 import sys
-from Tkinter import *
+from tkinter import *
+
 
 window_width = 800 #in pixels
 window_height = 600 #in pixels
@@ -10,7 +11,6 @@ map_width = 50 #number of cells
 map_height = 50 #number of cells
 scale = 5
 time_stamp = 200 #time_stamp[ms] = 1[min] of simulation
-
 
 
 # ---- CLASSES ----
@@ -49,6 +49,7 @@ class Cell:
         # 0 nothing
         # <1, 10> rain
 
+
 class Map:
 
     def __init__(self, width, height, canvas):
@@ -77,6 +78,68 @@ class Map:
         for i in range(0, map_height):
             for j in range(0, map_width):
                 self.grid[i][j] = Cell(copy.copy(random.choice(materials)), randint(0, 10), randint(5, 35), 0, randint(0, 100))
+
+    def randomCosmicGenerator(self, materials):
+
+        # Grass/Bushes/logs
+        for i in range(0,map_height):
+            for j in range(0,map_width):
+                if randint(0, 8) == 3:                                                  # Log -> 12,5%
+                    self.grid[i][j] = Cell(copy.copy(materials[2]), 3, 22, 0, 17)
+                elif randint(0, 2) == 1:                                                # Bush -> 17,5%
+                    self.grid[i][j] = Cell(copy.copy(materials[3]), 3, 22, 0, 17)
+                else:                                                                   # Grass -> rest
+                    self.grid[i][j] = Cell(copy.copy(materials[1]), 3, 22, 0, 17)
+
+        #Trees                                                                          # Trees overwrite
+                                                                                        # current cell with 25%
+        for i in range(1, map_height - 1):
+            for j in range(1, map_width - 1):
+                if randint(0, 3) == 1:
+                    self.grid[i][j] = Cell(copy.copy(materials[4]), 3, 22, 0, 17)
+
+        #Water                                                                          # Can occur 1 to 4 times,
+                                                                                        # it will spread untill
+                                                                                        # reach end of the map
+        quantity = randint(1, 4)
+        for o in range(0, quantity):
+
+            # random starting point
+            i = randint(5, map_height - 1)
+            j = randint(5, map_width - 1)
+            self.grid[i][j] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+
+            # GOD MACHINE FOR MAKING WATER
+            while 1:
+                if i+1 >= map_height or j+1 >= map_width or j <= 0: break
+                else:
+                    self.grid[i + 1][j + 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i + 1][j - 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i + 1][j] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i][j + 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+
+                if i-1 <= 0 or j-1 <= 0 or j >= map_width: break
+                else:
+                    self.grid[i - 1][j + 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i - 1][j - 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i - 1][j] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i][j - 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+
+                #  direction of spread
+                test = randint(0, 10)
+                if test < 4:
+                    j += 1
+                if test > 6:
+                    j -= 1
+                if test % 3 == 0:
+                    i += 1
+                if test == 5:
+                    test = test
+                if test % 3 == 1:
+                    i -= 1
+
+
+
 
     def drawMap(self):
         x_off = window_width/2 - map_width*scale/2
@@ -147,9 +210,8 @@ canvas.pack()
 #map class object init
 area = Map(map_width, map_height, canvas)
 
-#methods start
-area.generateRandomMap(materials)
-area.ignition()
+# area.generateRandomMap(materials)
+area.randomCosmicGenerator(materials)
 
 area.drawMap()
 area.setWind()
