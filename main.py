@@ -30,6 +30,7 @@ class Material:
         self.burning_temp = burning_temp
 
         #state:
+        #-1 cell is not taken into simulation
         #0 cannot burn
         #1 can burn
         #2 burning
@@ -54,7 +55,7 @@ class Map:
 
     def __init__(self, width, height, canvas):
         self.canvas = canvas
-        self.grid = [[0 for x in range(width)] for y in range(height)]
+        self.grid = [[0 for x in range(width+2)] for y in range(height+2)]
         self.wind_dir = randint(0, 359) #integer degree, cycling
         self.wind_power = randint(0 , 12) #beaufort
         self.texts_to_update = []
@@ -75,32 +76,39 @@ class Map:
         self.canvas.after(time_stamp, self._updateTexts)
 
     def generateRandomMap(self, materials):
-        for i in range(0, map_height):
-            for j in range(0, map_width):
+        for i in range(1, map_height+1):
+            for j in range(1, map_width+1):
                 self.grid[i][j] = Cell(copy.copy(random.choice(materials)), randint(0, 10), randint(5, 35), 0, randint(0, 100))
 
     def randomCosmicGenerator(self, materials):
+        # water border
+        for i in range(0, map_height+2):
+            self.grid[i][0] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+            self.grid[i][map_width+1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+        for i in range(0, map_width+2):
+            self.grid[0][i] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+            self.grid[map_height+1][i] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
 
         # Grass/Bushes/logs
-        for i in range(0,map_height):
-            for j in range(0,map_width):
-                if randint(0, 8) == 3:                                                  # Log -> 12,5%
+        for i in range(1,map_height+1):
+            for j in range(1,map_width+1):
+                if randint(0, 8) == 3: # Log -> 12,5%
                     self.grid[i][j] = Cell(copy.copy(materials[2]), 3, 22, 0, 17)
-                elif randint(0, 2) == 1:                                                # Bush -> 17,5%
+                elif randint(0, 2) == 1: # Bush -> 17,5%
                     self.grid[i][j] = Cell(copy.copy(materials[3]), 3, 22, 0, 17)
-                else:                                                                   # Grass -> rest
+                else: # Grass -> rest
                     self.grid[i][j] = Cell(copy.copy(materials[1]), 3, 22, 0, 17)
 
-        #Trees                                                                          # Trees overwrite
-                                                                                        # current cell with 25%
-        for i in range(1, map_height - 1):
-            for j in range(1, map_width - 1):
+        #Trees  # Trees overwrite
+                # current cell with 25%
+        for i in range(2, map_height):
+            for j in range(2, map_width):
                 if randint(0, 3) == 1:
                     self.grid[i][j] = Cell(copy.copy(materials[4]), 3, 22, 0, 17)
 
-        #Water                                                                          # Can occur 1 to 4 times,
-                                                                                        # it will spread untill
-                                                                                        # reach end of the map
+        #Water  # Can occur 1 to 4 times,
+                # it will spread untill
+                # reach end of the map
         quantity = randint(1, 4)
         for o in range(0, quantity):
 
@@ -138,16 +146,13 @@ class Map:
                 if test % 3 == 1:
                     i -= 1
 
-
-
-
     def drawMap(self):
         x_off = window_width/2 - map_width*scale/2
         y_off = window_height/2 - map_height*scale/2
-        for i in range(0, map_height):
-            for j in range(0, map_width):
-                col = "#%03x"%randint(0, 0xFFF)
-                #col = self.grid[i][j].material.color
+        for i in range(0, map_height+2):
+            for j in range(0, map_width+2):
+                #col = "#%03x"%randint(0, 0xFFF)
+                col = self.grid[i][j].material.color
                 self.canvas.create_rectangle(j*scale+x_off, i*scale+y_off, (j+1)*scale+x_off, (i+1)*scale+y_off, fill=col)
 
         self.canvas.pack()
@@ -179,25 +184,98 @@ class Map:
     def ignition(self):
         found = 0
         while found == 0:
-            x = randint(0, map_width-1)
-            y = randint(0, map_height-1)
+            x = randint(1, map_width)
+            y = randint(1, map_height)
             if(self.grid[y][x].material.state == 1):
                 found = 1
                 self.grid[y][x].material.state = 2
+                self.grid[y][x].material.color = "#ff0000"
                 #print "ogien x: ", x, " y: ", y
+
+    def simulation(self):
+        #print("symulacja")
+        for i in range(1, map_height+1):
+            for j in range(1, map_width+1):
+                if(self.grid[i][j].material.state == 2): #burning
+                    # --- FLASH POINT IGNITION ---
+                    update_array = [0] * 8
+                    temp = self.grid[i][j].material.burning_temp #temp of current cell
+
+                    if(self.grid[i-1][j-1].material.state == 1 and
+                    self.grid[i-1][j-1].material.flash_point_temp <= temp):
+                        update_array[0] = 1
+
+                    if(self.grid[i-1][j].material.state == 1 and
+                    self.grid[i-1][j].material.flash_point_temp <= temp):
+                        update_array[1] = 1
+
+                    if(self.grid[i-1][j+1].material.state == 1 and
+                    self.grid[i-1][j+1].material.flash_point_temp <= temp):
+                        update_array[2] = 1
+
+                    if(self.grid[i][j-1].material.state == 1 and
+                    self.grid[i][j-1].material.flash_point_temp <= temp):
+                        update_array[3] = 1
+
+                    if(self.grid[i][j+1].material.state == 1 and
+                    self.grid[i][j+1].material.flash_point_temp <= temp):
+                        update_array[4] = 1
+
+                    if(self.grid[i+1][j-1].material.state == 1 and
+                    self.grid[i+1][j-1].material.flash_point_temp <= temp):
+                        update_array[5] = 1
+
+                    if(self.grid[i+1][j].material.state == 1 and
+                    self.grid[i+1][j].material.flash_point_temp <= temp):
+                        update_array[6] = 1
+
+                    if(self.grid[i+1][j+1].material.state == 1 and
+                    self.grid[i+1][j+1].material.flash_point_temp <= temp):
+                        update_array[7] = 1
+
+
+                    # update section
+                    if(update_array[0] == 1):
+                        self.grid[i-1][j-1].material.state = 2
+                        self.grid[i-1][j-1].material.color = "#ff0000"
+                    if(update_array[1] == 1):
+                        self.grid[i-1][j].material.state = 2
+                        self.grid[i-1][j].material.color = "#ff0000"
+                    if(update_array[2] == 1):
+                        self.grid[i-1][j+1].material.state = 2
+                        self.grid[i-1][j+1].material.color = "#ff0000"
+                    if(update_array[3] == 1):
+                        self.grid[i][j-1].material.state = 2
+                        self.grid[i][j-1].material.color = "#ff0000"
+                    if(update_array[4] == 1):
+                        self.grid[i][j+1].material.state = 2
+                        self.grid[i][j+1].material.color = "#ff0000"
+                    if(update_array[5] == 1):
+                        self.grid[i+1][j-1].material.state = 2
+                        self.grid[i+1][j-1].material.color = "#ff0000"
+                    if(update_array[6] == 1):
+                        self.grid[i+1][j].material.state = 2
+                        self.grid[i+1][j].material.color = "#ff0000"
+                    if(update_array[7] == 1):
+                        self.grid[i+1][j+1].material.state = 2
+                        self.grid[i+1][j+1].material.color = "#ff0000"
+
+
+        self.canvas.after(time_stamp, self.simulation)
+
 
 
 
 # ---- FUNCTIONS ----
 
 # ---- MATERIALS ----
-#fuel, auto ign, flash point, state, color
+#fuel[min], auto ign[temp], flash point[temp], state, burning_temp[temp], color
 materials = [] #new materials can be add freerly
 materials.append(Material("Water", 0, 0, 0, 0, 0, "#0099ff"))
-materials.append(Material("DryGrass", 5, 300, 5, 1, 400, "#ffcc66"))
-materials.append(Material("Log", 15, 500, 10, 1, 500, "#666633"))
-materials.append(Material("Bush", 15, 500, 15, 1, 600, "#99cc00"))
-materials.append(Material("Tree", 1000, 1000, 30, 1, 1100, "#009933"))
+materials.append(Material("DryGrass", 5, 300, 500, 1, 400, "#ffcc66"))
+materials.append(Material("Log", 15, 500, 700, 1, 500, "#666633"))
+materials.append(Material("Bush", 15, 500, 300, 1, 600, "#99cc00"))
+materials.append(Material("Tree", 1000, 750, 30, 1, 1100, "#009933"))
 
 # ---- MAIN ----
 
@@ -210,9 +288,13 @@ canvas.pack()
 #map class object init
 area = Map(map_width, map_height, canvas)
 
+#start simulation
+
 # area.generateRandomMap(materials)
 area.randomCosmicGenerator(materials)
+area.ignition()
 
+area.simulation()
 area.drawMap()
 area.setWind()
 area.showClassVariables()
