@@ -1,14 +1,17 @@
-from random import randint
+from random import *
+import random
 import copy
 import sys
 from tkinter import *
 
 
-window_width = 1200 #in pixels
-window_height = 1200 #in pixels
-map_width = 200 #number of cells
-map_height = 200 #number of cells
+window_width = 800 #in pixels
+window_height = 600 #in pixels
+map_width = 50 #number of cells
+map_height = 50 #number of cells
 scale = 5
+time_stamp = 200 #time_stamp[ms] = 1[min] of simulation
+
 
 # ---- CLASSES ----
 
@@ -54,13 +57,27 @@ class Map:
         self.grid = [[0 for x in range(width)] for y in range(height)]
         self.wind_dir = randint(0, 359) #integer degree, cycling
         self.wind_power = randint(0 , 12) #beaufort
+        self.texts_to_update = []
 
     # ---- METODY ----
+
+    def showClassVariables(self): #dont use in case of static texts
+        self.texts_to_update.append(self.canvas.create_text(10, 10, fill="darkblue", font="Monospace 13", text="", anchor="nw"))
+
+        self.texts_to_update.append(self.canvas.create_text(10, 25, fill="darkblue", font="Monospace 13", text="", anchor="nw"))
+
+        self._updateTexts()
+
+    def _updateTexts(self): #private method, dont use outside
+        self.canvas.itemconfig(self.texts_to_update[0], text="dir: "+str(self.wind_dir))
+        self.canvas.itemconfig(self.texts_to_update[1], text="power: "+str(self.wind_power))
+
+        self.canvas.after(time_stamp, self._updateTexts)
 
     def generateRandomMap(self, materials):
         for i in range(0, map_height):
             for j in range(0, map_width):
-                self.grid[i][j] = Cell(copy.copy(materials[randint(0, len(materials)-1)]), randint(0, 10), randint(5, 35), 0, randint(0, 100))
+                self.grid[i][j] = Cell(copy.copy(random.choice(materials)), randint(0, 10), randint(5, 35), 0, randint(0, 100))
 
     def randomCosmicGenerator(self, materials):
 
@@ -129,30 +146,51 @@ class Map:
         y_off = window_height/2 - map_height*scale/2
         for i in range(0, map_height):
             for j in range(0, map_width):
-                #col = "#%03x"%randint(0, 0xFFF)
-                col = self.grid[i][j].material.color
+                col = "#%03x"%randint(0, 0xFFF)
+                #col = self.grid[i][j].material.color
                 self.canvas.create_rectangle(j*scale+x_off, i*scale+y_off, (j+1)*scale+x_off, (i+1)*scale+y_off, fill=col)
 
-        #canvas.create_rectangle(300, 300, 200, 10, fill="blue", outline="blue")
         self.canvas.pack()
-        self.canvas.after(500, self.drawMap)
+        self.canvas.after(time_stamp, self.drawMap)
 
     def setWind(self):
-        w_dir = randint(-1, 1)
-        w_pow = randint(1, 12)
+        w_dir = random.choice([-1, 0, 1])
+        #w_pow = random.choice([-1, 0, 0, 0, 0, 0, 0, 0, 1]) #sila wiatru bedzie sie zmieniac wolniej
+        w_pow = randint(-20, 20)
 
-        #if w_dir == 1 AND self.wind_dir == 359
-            #self.wind_dir
+        if w_dir == 1 and self.wind_dir == 359:
+            self.wind_dir = 0
+        elif  w_dir == -1 and self.wind_dir == 0:
+            self.wind_dir = 359
+        else:
+            self.wind_dir += w_dir
 
+        if w_pow == 1 and self.wind_power == 12:
+            self.wind_power = 12
+        elif w_pow == -1 and self.wind_power == 1:
+            self.wind_power = 1
+        elif w_pow == 1:
+            self.wind_power += 1
+        elif w_pow == -1:
+            self.wind_power -= 1
 
-        self.canvas.after(100, self.setWind)
+        self.canvas.after(time_stamp, self.setWind)
+
+    def ignition(self):
+        found = 0
+        while found == 0:
+            x = randint(0, map_width-1)
+            y = randint(0, map_height-1)
+            if(self.grid[y][x].material.state == 1):
+                found = 1
+                self.grid[y][x].material.state = 2
+                #print "ogien x: ", x, " y: ", y
 
 
 
 # ---- FUNCTIONS ----
 
 # ---- MATERIALS ----
-
 #fuel, auto ign, flash point, state, color
 materials = [] #new materials can be add freerly
 materials.append(Material("Water", 0, 0, 0, 0, 0, "#0099ff"))
@@ -163,60 +201,21 @@ materials.append(Material("Tree", 1000, 1000, 30, 1, 1100, "#009933"))
 
 # ---- MAIN ----
 
-#window initburning_temp
+#window init
 root = Tk()
 root.title = "WildFire Simulator"
 canvas = Canvas(root, width = window_width, height = window_height)
 canvas.pack()
 
+#map class object init
 area = Map(map_width, map_height, canvas)
+
 # area.generateRandomMap(materials)
 area.randomCosmicGenerator(materials)
+
 area.drawMap()
+area.setWind()
+area.showClassVariables()
+
+#loop start
 root.mainloop()
-
-
-
-#print("--- jestesmy tutaj ---")
-
-
-
-
-
-'''
-
-for i in range(0, map_height):
-    for j in range(0, map_width):
-        sys.stdout.write(str(area.grid[i][j].material.fuel))
-        sys.stdout.write("   ")
-    print("")
-
-
-TODO:
-
-CUDA
-1. Stworzyc 5 materialow
-2. Stworzyc mape, na poczatek moze to byc totalny random
-3. Zrobic metody, glownie w klasie Map poniewaz bedziemy operowac na Cella'ach
-4. Zrobic jakies wyswietlanie
-5. losowanie sily wiatru nie powinno byc rowno prawdopodobne dla wszystkich wartosci
-
-Notes:
-1. Docelowo wielkosc mapy ma byc okolo full HD (1920/1080)
-2. Wiatr ma byc staly, jednolity na cala mape
-3. Ogien na danej kratce przestaje sie palic tylko w dwoch wypadkach:
-- wypali sie paliwo
-- opad atmosferyczny zgasi ogien, jesli tak to ilosc paliwa pozostaje taka jak w ostatnim
-momencie palenia i zwieksza sie bardzo wilgotnosc
-4. Im wyzsza temperatura ognia tym szybciej wypala on paliwo
-5. Ogien rozprzestrzenia sie szybciej w kierunu wyzszych terenow oraz w kierunku wiania wiatru
-6. Auto ignition jest to temperatura w ktorej nastepuje samozaplon
-7. Flash point jest to temperatura w ktorej material podpala sie od otwartego ognia
-8. Jeden cykl odpowiada jednej minucie
-9. Kiedy kratka bedzie sie palic bedzie to sygnalizowane migajacym kolorem, im wolniej
-    miga tym mniej jest paliwa na danej kratce a kolor materialu dazy do czarnego
-
-
-oddawanie do max 21.05
-git
-'''
