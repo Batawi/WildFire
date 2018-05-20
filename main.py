@@ -9,8 +9,8 @@ window_width = 800 #in pixels
 window_height = 600 #in pixels
 map_width = 50 #number of cells
 map_height = 50 #number of cells
-scale = 5
-time_stamp = 200 #time_stamp[ms] = 1[min] of simulation
+scale = 10
+time_stamp = 1000 #time_stamp[ms] = 1[min] of simulation
 
 
 # ---- CLASSES ----
@@ -30,7 +30,6 @@ class Material:
         self.burning_temp = burning_temp
 
         #state:
-        #-1 cell is not taken into simulation
         #0 cannot burn
         #1 can burn
         #2 burning
@@ -190,79 +189,59 @@ class Map:
                 found = 1
                 self.grid[y][x].material.state = 2
                 self.grid[y][x].material.color = "#ff0000"
-                #print "ogien x: ", x, " y: ", y
+                print("ogien x: ", x, " y: ", y)
+                break
 
     def simulation(self):
-        #print("symulacja")
+        print("symulacja")
+        update_array = [[0 for x in range(map_width+2)] for y in range(map_height+2)]
+
         for i in range(1, map_height+1):
             for j in range(1, map_width+1):
                 if(self.grid[i][j].material.state == 2): #burning
                     # --- FLASH POINT IGNITION ---
-                    update_array = [0] * 8
                     temp = self.grid[i][j].material.burning_temp #temp of current cell
 
                     if(self.grid[i-1][j-1].material.state == 1 and
                     self.grid[i-1][j-1].material.flash_point_temp <= temp):
-                        update_array[0] = 1
+                        update_array[i-1][i-1] = 1
 
                     if(self.grid[i-1][j].material.state == 1 and
                     self.grid[i-1][j].material.flash_point_temp <= temp):
-                        update_array[1] = 1
+                        update_array[i-1][j] = 1
 
                     if(self.grid[i-1][j+1].material.state == 1 and
                     self.grid[i-1][j+1].material.flash_point_temp <= temp):
-                        update_array[2] = 1
+                        update_array[i-1][j+1] = 1
 
                     if(self.grid[i][j-1].material.state == 1 and
                     self.grid[i][j-1].material.flash_point_temp <= temp):
-                        update_array[3] = 1
+                        update_array[i][j-1] = 1
 
                     if(self.grid[i][j+1].material.state == 1 and
                     self.grid[i][j+1].material.flash_point_temp <= temp):
-                        update_array[4] = 1
+                        update_array[i][j+1] = 1
 
                     if(self.grid[i+1][j-1].material.state == 1 and
                     self.grid[i+1][j-1].material.flash_point_temp <= temp):
-                        update_array[5] = 1
+                        update_array[i+1][j-1] = 1
 
                     if(self.grid[i+1][j].material.state == 1 and
                     self.grid[i+1][j].material.flash_point_temp <= temp):
-                        update_array[6] = 1
+                        update_array[i+1][j] = 1
 
                     if(self.grid[i+1][j+1].material.state == 1 and
                     self.grid[i+1][j+1].material.flash_point_temp <= temp):
-                        update_array[7] = 1
+                        update_array[i+1][j+1] = 1
 
 
-                    # update section
-                    if(update_array[0] == 1):
-                        self.grid[i-1][j-1].material.state = 2
-                        self.grid[i-1][j-1].material.color = "#ff0000"
-                    if(update_array[1] == 1):
-                        self.grid[i-1][j].material.state = 2
-                        self.grid[i-1][j].material.color = "#ff0000"
-                    if(update_array[2] == 1):
-                        self.grid[i-1][j+1].material.state = 2
-                        self.grid[i-1][j+1].material.color = "#ff0000"
-                    if(update_array[3] == 1):
-                        self.grid[i][j-1].material.state = 2
-                        self.grid[i][j-1].material.color = "#ff0000"
-                    if(update_array[4] == 1):
-                        self.grid[i][j+1].material.state = 2
-                        self.grid[i][j+1].material.color = "#ff0000"
-                    if(update_array[5] == 1):
-                        self.grid[i+1][j-1].material.state = 2
-                        self.grid[i+1][j-1].material.color = "#ff0000"
-                    if(update_array[6] == 1):
-                        self.grid[i+1][j].material.state = 2
-                        self.grid[i+1][j].material.color = "#ff0000"
-                    if(update_array[7] == 1):
-                        self.grid[i+1][j+1].material.state = 2
-                        self.grid[i+1][j+1].material.color = "#ff0000"
-
+        for i in range(1, map_height+1):
+            for j in range(1, map_width+1):
+                if(update_array[i][j] == 1):
+                    self.grid[i][j].material.state = 2
+                    self.grid[i][j].material.color = "#ff0000"
 
         self.canvas.after(time_stamp, self.simulation)
-
 
 
 
@@ -290,11 +269,12 @@ area = Map(map_width, map_height, canvas)
 
 #start simulation
 
-# area.generateRandomMap(materials)
+#area.generateRandomMap(materials)
 area.randomCosmicGenerator(materials)
 area.ignition()
 
 area.simulation()
+
 area.drawMap()
 area.setWind()
 area.showClassVariables()
