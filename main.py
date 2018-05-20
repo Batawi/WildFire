@@ -190,56 +190,69 @@ class Map:
                 self.grid[y][x].material.state = 2
                 self.grid[y][x].material.color = "#ff0000"
                 print("ogien x: ", x, " y: ", y)
-                break
 
     def simulation(self):
         print("symulacja")
-        update_array = [[0 for x in range(map_width+2)] for y in range(map_height+2)]
+        ignition_update = [[0 for x in range(map_width+2)] for y in range(map_height+2)] #ignite new cells
+        burn_update = [[0 for x in range(map_width+2)] for y in range(map_height+2)] #Hp management
 
         for i in range(1, map_height+1):
             for j in range(1, map_width+1):
                 if(self.grid[i][j].material.state == 2): #burning
+
                     # --- FLASH POINT IGNITION ---
                     temp = self.grid[i][j].material.burning_temp #temp of current cell
 
                     if(self.grid[i-1][j-1].material.state == 1 and
                     self.grid[i-1][j-1].material.flash_point_temp <= temp):
-                        update_array[i-1][i-1] = 1
+                        ignition_update[i-1][j-1] = 1
 
                     if(self.grid[i-1][j].material.state == 1 and
                     self.grid[i-1][j].material.flash_point_temp <= temp):
-                        update_array[i-1][j] = 1
+                        ignition_update[i-1][j] = 1
 
                     if(self.grid[i-1][j+1].material.state == 1 and
                     self.grid[i-1][j+1].material.flash_point_temp <= temp):
-                        update_array[i-1][j+1] = 1
+                        ignition_update[i-1][j+1] = 1
 
                     if(self.grid[i][j-1].material.state == 1 and
                     self.grid[i][j-1].material.flash_point_temp <= temp):
-                        update_array[i][j-1] = 1
+                        ignition_update[i][j-1] = 1
 
                     if(self.grid[i][j+1].material.state == 1 and
                     self.grid[i][j+1].material.flash_point_temp <= temp):
-                        update_array[i][j+1] = 1
+                        ignition_update[i][j+1] = 1
 
                     if(self.grid[i+1][j-1].material.state == 1 and
                     self.grid[i+1][j-1].material.flash_point_temp <= temp):
-                        update_array[i+1][j-1] = 1
+                        ignition_update[i+1][j-1] = 1
 
                     if(self.grid[i+1][j].material.state == 1 and
                     self.grid[i+1][j].material.flash_point_temp <= temp):
-                        update_array[i+1][j] = 1
+                        ignition_update[i+1][j] = 1
 
                     if(self.grid[i+1][j+1].material.state == 1 and
                     self.grid[i+1][j+1].material.flash_point_temp <= temp):
-                        update_array[i+1][j+1] = 1
+                        ignition_update[i+1][j+1] = 1
+
+                    # --- HIT POINTS MANAGEMENT ---
+                    burn_update[i][j] = 1
+
 
 
         for i in range(1, map_height+1):
             for j in range(1, map_width+1):
-                if(update_array[i][j] == 1):
+                if(ignition_update[i][j] == 1):
                     self.grid[i][j].material.state = 2
                     self.grid[i][j].material.color = "#ff0000"
+                    ignition_update[i][j] = 0
+
+                if(burn_update[i][j] == 1):
+                    self.grid[i][j].material.fuel -= 1
+                    burn_update[i][j] = 0
+                    if(self.grid[i][j].material.fuel == 0):
+                        self.grid[i][j].material.state = 3 #burned
+                        self.grid[i][j].material.color = "#000000"
 
         self.canvas.after(time_stamp, self.simulation)
 
@@ -276,7 +289,7 @@ area.ignition()
 area.simulation()
 
 area.drawMap()
-area.setWind()
+#area.setWind()
 area.showClassVariables()
 
 #loop start
