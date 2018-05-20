@@ -213,81 +213,229 @@ class Map:
 
                     if(self.wind_power == 0 or self.wind_power == 1):
 
+                        # power 0
+
                         if(self.grid[i-1][j].material.state == 1 and
                         self.grid[i-1][j].material.flash_point_temp <= temp):
-                        ignition_update[i-1][j] = 1
+                            ignition_update[i-1][j] = 1
 
                         if(self.grid[i][j-1].material.state == 1 and
                         self.grid[i][j-1].material.flash_point_temp <= temp):
-                        ignition_update[i][j-1] = 1
+                            ignition_update[i][j-1] = 1
 
                         if(self.grid[i][j+1].material.state == 1 and
                         self.grid[i][j+1].material.flash_point_temp <= temp):
-                        ignition_update[i][j+1] = 1
+                            ignition_update[i][j+1] = 1
 
                         if(self.grid[i+1][j].material.state == 1 and
                         self.grid[i+1][j].material.flash_point_temp <= temp):
-                        ignition_update[i+1][j] = 1
+                            ignition_update[i+1][j] = 1
 
                         # power 1
 
                         if(self.wind_power == 1 and self.wind_dir == 0): #N
                             if(self.grid[i-2][j].material.state == 1 and
                             self.grid[i-2][j].material.flash_point_temp <= temp):
-                            ignition_update[i-2][j] = 1
+                                ignition_update[i-2][j] = 1
 
                         if(self.wind_power == 1 and self.wind_dir == 1): #NE
-                            if(self.grid[i+1][j+1].material.state == 1 and
-                            self.grid[i+1][j+1].material.flash_point_temp <= temp):
-                            ignition_update[i+1][j+1] = 1
+                            if(self.grid[i-1][j+1].material.state == 1 and
+                            self.grid[i-1][j+1].material.flash_point_temp <= temp):
+                                ignition_update[i-1][j+1] = 1
 
                         if(self.wind_power == 1 and self.wind_dir == 2): #E
                             if(self.grid[i][j+2].material.state == 1 and
                             self.grid[i][j+2].material.flash_point_temp <= temp):
-                            ignition_update[i][j+2] = 1
+                                ignition_update[i][j+2] = 1
 
                         if(self.wind_power == 1 and self.wind_dir == 3): #ES
                             if(self.grid[i+1][j+1].material.state == 1 and
                             self.grid[i+1][j+1].material.flash_point_temp <= temp):
-                            ignition_update[i+1][j+1] = 1
+                                ignition_update[i+1][j+1] = 1
 
                         if(self.wind_power == 1 and self.wind_dir == 4): #S
                             if(self.grid[i+2][j].material.state == 1 and
                             self.grid[i+2][j].material.flash_point_temp <= temp):
-                            ignition_update[i+2][j] = 1
+                                ignition_update[i+2][j] = 1
 
                         if(self.wind_power == 1 and self.wind_dir == 5): #SW
                             if(self.grid[i+1][j-1].material.state == 1 and
                             self.grid[i+1][j-1].material.flash_point_temp <= temp):
-                            ignition_update[i+1][j-1] = 1
+                                ignition_update[i+1][j-1] = 1
 
                         if(self.wind_power == 1 and self.wind_dir == 6): #W
                             if(self.grid[i][j-2].material.state == 1 and
                             self.grid[i][j-2].material.flash_point_temp <= temp):
-                            ignition_update[i][j-2] = 1
+                                ignition_update[i][j-2] = 1
 
                         if(self.wind_power == 1 and self.wind_dir == 7): #WN
+                            if(self.grid[i-1][j-1].material.state == 1 and
+                            self.grid[i-1][j-1].material.flash_point_temp <= temp):
+                                ignition_update[i-1][j-1] = 1
+
+                    # power 2 or 3
+                    elif(self.wind_power == 2 or self.wind_power == 3):
+
+                        if(self.wind_dir == 0): #N
                             if(self.grid[i-1][j].material.state == 1 and
                             self.grid[i-1][j].material.flash_point_temp <= temp):
-                            ignition_update[i-1][j] = 1
+                                ignition_update[i-1][j] = 1
+                            if(self.grid[i-2][j].material.state == 1 and
+                            self.grid[i-2][j].material.flash_point_temp <= temp):
+                                ignition_update[i-2][j] = 1
+
+                        if(self.wind_dir == 2): #E
+                            if(self.grid[i][j+1].material.state == 1 and
+                            self.grid[i][j+1].material.flash_point_temp <= temp):
+                                ignition_update[i][j+1] = 1
+                            if(self.grid[i][j+2].material.state == 1 and
+                            self.grid[i][j+2].material.flash_point_temp <= temp):
+                                ignition_update[i][j+2] = 1
+
+                        if(self.wind_dir == 4): #S
+                            if(self.grid[i+1][j].material.state == 1 and
+                            self.grid[i+1][j].material.flash_point_temp <= temp):
+                                ignition_update[i+1][j] = 1
+                            if(self.grid[i+2][j].material.state == 1 and
+                            self.grid[i+2][j].material.flash_point_temp <= temp):
+                                ignition_update[i+2][j] = 1
+
+                        if(self.wind_dir == 6): #W
+                            if(self.grid[i][j-1].material.state == 1 and
+                            self.grid[i][j-1].material.flash_point_temp <= temp):
+                                ignition_update[i][j-1] = 1
+                            if(self.grid[i][j-2].material.state == 1 and
+                            self.grid[i][j-2].material.flash_point_temp <= temp):
+                                ignition_update[i][j-2] = 1
+
+                        if(self.wind_dir == 1): #NE
+                            if(self.grid[i-1][j].material.state == 1 and
+                            self.grid[i-1][j].material.flash_point_temp <= temp):
+                                ignition_update[i-1][j] = 1
+                            if(self.grid[i][j+1].material.state == 1 and
+                            self.grid[i][j+1].material.flash_point_temp <= temp):
+                                ignition_update[i][j+1] = 1
+                            if(self.grid[i-1][j+1].material.state == 1 and
+                            self.grid[i-1][j+1].material.flash_point_temp <= temp):
+                                ignition_update[i-1][j+1] = 1
+
+                        if(self.wind_dir == 3): #SE
+                            if(self.grid[i][j+1].material.state == 1 and
+                            self.grid[i][j+1].material.flash_point_temp <= temp):
+                                ignition_update[i][j+1] = 1
+                            if(self.grid[i+1][j].material.state == 1 and
+                            self.grid[i+1][j].material.flash_point_temp <= temp):
+                                ignition_update[i+1][j] = 1
+                            if(self.grid[i+1][j+1].material.state == 1 and
+                            self.grid[i+1][j+1].material.flash_point_temp <= temp):
+                                ignition_update[i+1][j+1] = 1
+
+                        if(self.wind_dir == 5): #SW
+                            if(self.grid[i][j-1].material.state == 1 and
+                            self.grid[i][j-1].material.flash_point_temp <= temp):
+                                ignition_update[i][j-1] = 1
+                            if(self.grid[i+1][j].material.state == 1 and
+                            self.grid[i+1][j].material.flash_point_temp <= temp):
+                                ignition_update[i+1][j] = 1
+                            if(self.grid[i+1][j-1].material.state == 1 and
+                            self.grid[i+1][j-1].material.flash_point_temp <= temp):
+                                ignition_update[i+1][j-1] = 1
+
+                        if(self.wind_dir == 7): #NW
+                            if(self.grid[i-1][j].material.state == 1 and
+                            self.grid[i-1][j].material.flash_point_temp <= temp):
+                                ignition_update[i-1][j] = 1
+                            if(self.grid[i][j-1].material.state == 1 and
+                            self.grid[i][j-1].material.flash_point_temp <= temp):
+                                ignition_update[i][j-1] = 1
+                            if(self.grid[i-1][j-1].material.state == 1 and
+                            self.grid[i-1][j-1].material.flash_point_temp <= temp):
+                                ignition_update[i-1][j-1] = 1
 
 
+                        if(self.wind_power == 2):
+                            if(self.wind_dir == 0 or self.wind_dir == 4): #N and S
+                                if(self.grid[i][j+1].material.state == 1 and
+                                self.grid[i][j+1].material.flash_point_temp <= temp):
+                                    ignition_update[i][j+1] = 1
+                                if(self.grid[i][j-1].material.state == 1 and
+                                self.grid[i][j-1].material.flash_point_temp <= temp):
+                                    ignition_update[i][j-1] = 1
 
-                    if(self.grid[i-1][j-1].material.state == 1 and
-                    self.grid[i-1][j-1].material.flash_point_temp <= temp):
-                        ignition_update[i-1][j-1] = 1
+                            if(self.wind_dir == 2 or self.wind_dir == 6): #E and W
+                                if(self.grid[i+1][j].material.state == 1 and
+                                self.grid[i+1][j].material.flash_point_temp <= temp):
+                                    ignition_update[i+1][j] = 1
+                                if(self.grid[i-1][j].material.state == 1 and
+                                self.grid[i-1][j].material.flash_point_temp <= temp):
+                                    ignition_update[i-1][j] = 1
 
-                    if(self.grid[i-1][j+1].material.state == 1 and
-                    self.grid[i-1][j+1].material.flash_point_temp <= temp):
-                        ignition_update[i-1][j+1] = 1
+                        if(self.wind_power == 3):
+                            if(self.wind_dir == 0): #N
+                                if(self.grid[i-3][j].material.state == 1 and
+                                self.grid[i-3][j].material.flash_point_temp <= temp):
+                                    ignition_update[i-3][j] = 1
+                                if(self.grid[i-1][j-1].material.state == 1 and
+                                self.grid[i-1][j-1].material.flash_point_temp <= temp):
+                                    ignition_update[i-1][j-1] = 1
+                                if(self.grid[i-1][j+1].material.state == 1 and
+                                self.grid[i-1][j+1].material.flash_point_temp <= temp):
+                                    ignition_update[i-1][j+1] = 1
 
-                    if(self.grid[i+1][j-1].material.state == 1 and
-                    self.grid[i+1][j-1].material.flash_point_temp <= temp):
-                        ignition_update[i+1][j-1] = 1
+                            if(self.wind_dir == 2): #E
+                                if(self.grid[i][j+3].material.state == 1 and
+                                self.grid[i][j+3].material.flash_point_temp <= temp):
+                                    ignition_update[i][j+3] = 1
+                                if(self.grid[i+1][j+1].material.state == 1 and
+                                self.grid[i+1][j+1].material.flash_point_temp <= temp):
+                                    ignition_update[i+1][j+1] = 1
+                                if(self.grid[i-1][j+1].material.state == 1 and
+                                self.grid[i-1][j+1].material.flash_point_temp <= temp):
+                                    ignition_update[i-1][j+1] = 1
 
-                    if(self.grid[i+1][j+1].material.state == 1 and
-                    self.grid[i+1][j+1].material.flash_point_temp <= temp):
-                        ignition_update[i+1][j+1] = 1
+                            if(self.wind_dir == 4): #S
+                                if(self.grid[i+3][j].material.state == 1 and
+                                self.grid[i+3][j].material.flash_point_temp <= temp):
+                                    ignition_update[i+3][j] = 1
+                                if(self.grid[i+1][j+1].material.state == 1 and
+                                self.grid[i+1][j+1].material.flash_point_temp <= temp):
+                                    ignition_update[i+1][j+1] = 1
+                                if(self.grid[i+1][j-1].material.state == 1 and
+                                self.grid[i+1][j-1].material.flash_point_temp <= temp):
+                                    ignition_update[i+1][j-1] = 1
+
+                            if(self.wind_dir == 6): #W
+                                if(self.grid[i-3][j].material.state == 1 and
+                                self.grid[i-3][j].material.flash_point_temp <= temp):
+                                    ignition_update[i-3][j] = 1
+                                if(self.grid[i-1][j-1].material.state == 1 and
+                                self.grid[i-1][j-1].material.flash_point_temp <= temp):
+                                    ignition_update[i-1][j-1] = 1
+                                if(self.grid[i+1][j-1].material.state == 1 and
+                                self.grid[i+1][j-1].material.flash_point_temp <= temp):
+                                    ignition_update[i+1][j-1] = 1
+
+                            if(self.wind_dir == 1): # NE
+                                if(self.grid[i-2][j+2].material.state == 1 and
+                                self.grid[i-2][j+2].material.flash_point_temp <= temp):
+                                    ignition_update[i-2][j+2] = 1
+
+                            if(self.wind_dir == 3): # SE
+                                if(self.grid[i+2][j+2].material.state == 1 and
+                                self.grid[i+2][j+2].material.flash_point_temp <= temp):
+                                    ignition_update[i+2][j+2] = 1
+
+                            if(self.wind_dir == 5): # SW
+                                if(self.grid[i+2][j-2].material.state == 1 and
+                                self.grid[i+2][j-2].material.flash_point_temp <= temp):
+                                    ignition_update[i+2][j-2] = 1
+
+                            if(self.wind_dir == 7): # NW
+                                if(self.grid[i-2][j-2].material.state == 1 and
+                                self.grid[i-2][j-2].material.flash_point_temp <= temp):
+                                    ignition_update[i-2][j-2] = 1
+
+                                    
 
                     # --- HIT POINTS MANAGEMENT ---
                     burn_update[i][j] = 1
