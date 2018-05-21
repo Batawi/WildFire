@@ -11,7 +11,7 @@ map_width = 50 #number of cells
 map_height = 50 #number of cells
 scale = 10
 time_stamp = 1000 #time_stamp[ms] = 1[min] of simulation
-
+ini = 0
 
 # ---- CLASSES ----
 
@@ -37,12 +37,11 @@ class Material:
 
 class Cell:
 
-    def __init__(self, material, humidity, temp, downfall, height):
+    def __init__(self, material, humidity, temp, downfall):
         self.material = material
         self.humidity = humidity #from 0 to 10
         self.temp = temp
         self.downfall = downfall
-        self.height = height
 
         #downfall
         # <-10, -1> snow
@@ -75,71 +74,67 @@ class Map:
 
         self.canvas.after(time_stamp, self._updateTexts)
 
-    def generateRandomMap(self, materials):
-        for i in range(3, map_height+3):
-            for j in range(3, map_width+3):
-                self.grid[i][j] = Cell(copy.copy(random.choice(materials)), randint(0, 10), randint(5, 35), 0, randint(0, 100))
 
     def randomCosmicGenerator(self, materials):
         # water border, size = 3
         for i in range(0, map_height+6):
-            self.grid[i][0] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-            self.grid[i][1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-            self.grid[i][2] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-            self.grid[i][map_width+3] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-            self.grid[i][map_width+4] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-            self.grid[i][map_width+5] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+            self.grid[i][0] = Cell(copy.copy(materials[0]), 10, 12, 0)
+            self.grid[i][1] = Cell(copy.copy(materials[0]), 10, 12, 0)
+            self.grid[i][2] = Cell(copy.copy(materials[0]), 10, 12, 0)
+            self.grid[i][map_width+3] = Cell(copy.copy(materials[0]), 10, 12, 0)
+            self.grid[i][map_width+4] = Cell(copy.copy(materials[0]), 10, 12, 0)
+            self.grid[i][map_width+5] = Cell(copy.copy(materials[0]), 10, 12, 0)
         for i in range(3, map_width+3):
-            self.grid[0][i] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-            self.grid[1][i] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-            self.grid[2][i] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-            self.grid[map_height+3][i] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-            self.grid[map_height+4][i] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-            self.grid[map_height+5][i] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+            self.grid[0][i] = Cell(copy.copy(materials[0]), 10, 12, 0)
+            self.grid[1][i] = Cell(copy.copy(materials[0]), 10, 12, 0)
+            self.grid[2][i] = Cell(copy.copy(materials[0]), 10, 12, 0)
+            self.grid[map_height+3][i] = Cell(copy.copy(materials[0]), 10, 12, 0)
+            self.grid[map_height+4][i] = Cell(copy.copy(materials[0]), 10, 12, 0)
+            self.grid[map_height+5][i] = Cell(copy.copy(materials[0]), 10, 12, 0)
 
         # Grass/Bushes/logs
         for i in range(3,map_height+3):
             for j in range(3,map_width+3):
-                if randint(0, 8) == 3: # Log -> 12,5%
-                    self.grid[i][j] = Cell(copy.copy(materials[2]), 3, 22, 0, 17)
-                elif randint(0, 2) == 1: # Bush -> 17,5%
-                    self.grid[i][j] = Cell(copy.copy(materials[3]), 3, 22, 0, 17)
-                else: # Grass -> rest
-                    self.grid[i][j] = Cell(copy.copy(materials[1]), 3, 22, 0, 17)
+                if randint(0, 4) == 1: # Log
+                    self.grid[i][j] = Cell(copy.copy(materials[2]), 3, 22, 0)
+                elif randint(0, 1) == 1: # Bush
+                    self.grid[i][j] = Cell(copy.copy(materials[3]), 3, 22, 0)
+                else: # Grass
+                    self.grid[i][j] = Cell(copy.copy(materials[1]), 3, 22, 0)
 
         #Trees  # Trees overwrite
                 # current cell with 25%
         for i in range(4, map_height+2):
             for j in range(4, map_width+2):
                 if randint(0, 3) == 1:
-                    self.grid[i][j] = Cell(copy.copy(materials[4]), 3, 22, 0, 17)
+                    self.grid[i][j] = Cell(copy.copy(materials[4]), 3, 22, 0)
 
-        #Water  # Can occur 1 to 4 times,
+        #Water  # Can occur 1 to 3 times,
                 # it will spread untill
                 # reach end of the map
-        quantity = randint(1, 4)
+        quantity = randint(1, 3)
         for o in range(0, quantity):
 
             # random starting point
             i = randint(5, map_height - 1)
             j = randint(5, map_width - 1)
-            self.grid[i][j] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+            self.grid[i][j] = Cell(copy.copy(materials[0]), 10, 12, 0)
 
             # GOD MACHINE FOR MAKING WATER
             while 1:
                 if i+1 >= map_height or j+1 >= map_width or j <= 0: break
                 else:
-                    self.grid[i + 1][j + 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-                    self.grid[i + 1][j - 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-                    self.grid[i + 1][j] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-                    self.grid[i][j + 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i + 1][j + 1] = Cell(copy.copy(materials[0]), 10, 12, 0)
+                    self.grid[i + 1][j - 1] = Cell(copy.copy(materials[0]), 10, 12, 0)
+                    self.grid[i + 1][j] = Cell(copy.copy(materials[0]), 10, 12, 0)
+                    self.grid[i][j + 1] = Cell(copy.copy(materials[0]), 10, 12, 0)
 
                 if i-1 <= 0 or j-1 <= 0 or j >= map_width: break
                 else:
-                    self.grid[i - 1][j + 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-                    self.grid[i - 1][j - 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-                    self.grid[i - 1][j] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
-                    self.grid[i][j - 1] = Cell(copy.copy(materials[0]), 10, 12, 0, 12)
+                    self.grid[i - 1][j + 1] = Cell(copy.copy(materials[0]), 10, 12, 0)
+                    self.grid[i - 1][j - 1] = Cell(copy.copy(materials[0]), 10, 12, 0)
+                    self.grid[i - 1][j] = Cell(copy.copy(materials[0]), 10, 12, 0)
+                    self.grid[i][j - 1] = Cell(copy.copy(materials[0]), 10, 12, 0)
 
                 #  direction of spread
                 test = randint(0, 10)
@@ -159,7 +154,6 @@ class Map:
         y_off = window_height/2 - (map_height+6)*scale/2
         for i in range(3, map_height+3):
             for j in range(3, map_width+3):
-                #col = "#%03x"%randint(0, 0xFFF)
                 col = self.grid[i][j].material.color
                 self.canvas.create_rectangle(j*scale+x_off, i*scale+y_off, (j+1)*scale+x_off, (i+1)*scale+y_off, fill=col)
 
@@ -168,8 +162,8 @@ class Map:
 
     def setWind(self):
         w_dir = random.choice([-1, 0, 0, 0, 0, 0, 1])
-        #w_pow = random.choice([-1, 0, 0, 0, 0, 0, 0, 0, 1]) #sila wiatru bedzie sie zmieniac wolniej
-        w_pow = randint(-20, 20)
+        w_pow = random.choice([-1, 0, 0, 0, 0, 0, 0, 0, 1]) #sila wiatru bedzie sie zmieniac wolniej
+        #w_pow = randint(-20, 20)
 
         if w_dir == 1 and self.wind_dir == 7:
             self.wind_dir = 0
@@ -201,12 +195,12 @@ class Map:
                 print("ogien x: ", x, " y: ", y)
 
     def simulation(self):
-        print("symulacja")
+        # print("symulacja")
         ignition_update = [[0 for x in range(map_width+6)] for y in range(map_height+6)] #ignite new cells
         burn_update = [[0 for x in range(map_width+6)] for y in range(map_height+6)] #Hp management
 
-        for i in range(1, map_height+1):
-            for j in range(1, map_width+1):
+        for i in range(1, map_height+2):
+            for j in range(1, map_width+2):
                 if(self.grid[i][j].material.state == 2): #burning
 
                     # --- FLASH POINT IGNITION ---
@@ -464,35 +458,36 @@ class Map:
 # ---- FUNCTIONS ----
 
 # ---- MATERIALS ----
-#fuel[min], auto ign[temp], flash point[temp], state, burning_temp[temp], color
-materials = [] #new materials can be add freerly
+# fuel[min], auto ign[temp], flash point[temp], state, burning_temp[temp], color
+
+materials = [] # new materials can be add freerly
 materials.append(Material("Water", 0, 0, 0, 0, 0, "#0099ff"))
-materials.append(Material("DryGrass", 5, 300, 500, 1, 400, "#ffcc66"))
-materials.append(Material("Log", 15, 500, 700, 1, 500, "#666633"))
-materials.append(Material("Bush", 15, 500, 300, 1, 600, "#99cc00"))
-materials.append(Material("Tree", 1000, 750, 30, 1, 1100, "#009933"))
+materials.append(Material("DryGrass", 2, 100, 500, 1, 400, "#ffcc66"))
+materials.append(Material("Log", 5, 500, 300, 1, 600, "#666633"))
+materials.append(Material("Bush", 7, 500, 400, 1, 600, "#99cc00"))
+materials.append(Material("Tree", 15, 750, 600, 1, 900, "#009933"))
 
 # ---- MAIN ----
 
+
+
+
+
 #window init
 root = Tk()
-root.title = "WildFire Simulator"
-canvas = Canvas(root, width = window_width, height = window_height)
+canvas = Canvas( root, width = window_width, height = window_height)
 canvas.pack()
-
-#map class object init
+root.title = "WildFire Simulator"
 area = Map(map_width, map_height, canvas)
 
-#start simulation
+if 0 == ini:
+    area.randomCosmicGenerator(materials)
+    area.setWind()
+    ini = 1
 
-#area.generateRandomMap(materials)
-area.randomCosmicGenerator(materials)
 area.ignition()
-
 area.simulation()
-
 area.drawMap()
-area.setWind()
 area.showClassVariables()
 
 #loop start
