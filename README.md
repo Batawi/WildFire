@@ -7,7 +7,7 @@ Simulation is based on:
 * State of burning material
 * Lay of the land (i.e. water reservoir as fire spread barier)
 
-Wind's power and direction are constant for whole map.
+Wind's power and direction are constant for whole map but changes in time.
 Maps are random generated.
 
 
