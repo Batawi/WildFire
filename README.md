@@ -9,3 +9,6 @@ Simulation is based on:
 
 Wind's power and direction are constant for whole map.
 Maps are random generated.
+
+
+![alt text](https://github.com/Batawi/WildFire/blob/master/wildfire.png)
