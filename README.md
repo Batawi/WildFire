@@ -9,6 +9,7 @@ Simulation is based on:
 
 Wind's power and direction are constant for whole map but changes in time.
 Maps are random generated.
+To run it use Python3.
 
 
 ![screen_from_simulation](https://github.com/Batawi/WildFire/blob/master/wildfire.png)
