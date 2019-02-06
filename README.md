@@ -2,13 +2,13 @@
 Simulation of wildfire spread using cellular automaton.
 
 Simulation is based on:
-* Wind direction and it's power
-* Type of burning material (with it's properties)
+* Wind direction and its power
+* Type of burning material (with its properties)
 * State of burning material
-* Lay of the land (i.e. water reservoir as fire spread barier)
+* Lay of the land (i.e. water reservoir as fire barier)
 
-Wind's power and direction are constant for whole map but changes in time.
-Maps are random generated.
+Winds power and direction are constant for whole map but changes in time.
+Maps are randomly generated.
 To run it use Python3.
 
 
